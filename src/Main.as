@@ -29,16 +29,28 @@ package
 		private var lineContainer:MovieClip;				
 		private var honeyText:Array;
 		private var effects:MovieClip;
+		private var turnTime:int;
+		private var turns:int;
+
+		private var frame:int = 0;
+		private var seconds:int;
 		
+		public static const FPS:int = 60;
+		private var nextTurn:int;
+		private var turnText:TextField;
+		private var timeText:TextField;
+		private var scoreText:TextField;
+		private var swipeType:int;
+
 		public function Main() {
 
 			var tiles:Array = [
-				new Tile(new flower_1(), GameLogic.FLOWER0),
-				new Tile(new flower_2(), GameLogic.FLOWER1),
-				new Tile(new bee(), GameLogic.BEE),
 				new Tile(new honeyJar_blue, GameLogic.HONEY0),
 				new Tile(new honeyJar_green(), GameLogic.HONEY1),
-				new Tile(new honeyJar_red(), GameLogic.HONEY2), /*
+				new Tile(new honeyJar_red(), GameLogic.HONEY2),
+				new Tile(new flower_1(), GameLogic.FLOWER0),
+				new Tile(new flower_2(), GameLogic.FLOWER1),
+				new Tile(new bee(), GameLogic.BEE) /*,
 				new Tile(new balloon(), GameLogic.FLOWER0),
 				new Tile(new sealionHead(), GameLogic.BEE),
 				new Tile(new ballGreen(), GameLogic.HONEY0),
@@ -46,17 +58,19 @@ package
 				new Tile(new ballOrange(), GameLogic.HONEY2) */
 			];
 
-			tileSize = 120;
+			tileSize = 100;
 			padding = 5;
 			boardWidth = 6;
 			boardHeight = 6;
+			turnTime = 10;
+			turns = 10;
 			
 			var bm:Bitmap = new Bitmap(new background());
 			bm.smoothing = true;
 			bm.scaleX = stage.stageWidth / bm.width;
 			bm.scaleY = stage.stageHeight / bm.height;
 
-			addChild(bm);
+			//addChild(bm);
 						
 			for each(var t:Tile in tiles) {
 				if(t.dob is MovieClip)
@@ -74,21 +88,32 @@ package
 			gameBoard = new GameBoard(gameBoardContainer, lineContainer, boardWidth, boardHeight, tileSize, tiles);
 			swipeSeq = new SwipeSequence(gameBoard); //boardWidth, boardHeight, tileSize, tileSize);
 			
-			gameLogic = new GameLogic(gameBoard);
+			gameLogic = new GameLogic(gameBoard, turnTime, turns);
 			
-			honeyText = [ new TextField(), new TextField(), new TextField() ];
+			/*honeyText = [ makeTextField(), makeTextField(), makeTextField() ];
 			var i:int = 0;
 			for each(var tf:TextField in honeyText) {
 				tf.y = 20;
 				tf.x = 50 + 100 * i++;
-				tf.defaultTextFormat = new TextFormat("Arial", 32, 0xffffffff, true);
-				tf.mouseEnabled = false;
-				tf.type = TextFieldType.DYNAMIC;
-				tf.text = '0';
-				tf.textColor = 0xffffffff;
 				addChild(tf);
-			}
+			}*/
+			
+			turnText = makeTextField();
+			turnText.x = 10;
+			turnText.y = 720;
+			addChild(turnText);
+			
+			timeText = makeTextField();
+			timeText.x = 210;
+			timeText.y = 720;
+			addChild(timeText);
+			
+			scoreText = makeTextField();
+			scoreText.x = 900;
+			scoreText.y = 720;
+			addChild(scoreText);
 
+			
 			effects = new MovieClip();
 			addChild(effects);
 			
@@ -102,6 +127,52 @@ package
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		}
 		
+		private function makeTextField():TextField {
+			
+			var tf:TextField = new TextField();			
+			tf.defaultTextFormat = new TextFormat("Arial", 32, 0xffffffff, true);
+			tf.mouseEnabled = false;
+			tf.type = TextFieldType.DYNAMIC;
+			tf.text = '0';
+			tf.textColor = 0xffffffff;
+			return tf;
+		}
+		
+		private function endSwipe():void {
+			swipeSeq.end();
+			if(swipeSeq.length() >= 3) {
+				
+				swipeType = gameLogic.handleSequence(swipeSeq);
+				if(swipeType) {
+					gameBoard.remove(swipeSeq);
+					
+					for each(var i:int in swipeSeq.getIndexes()) {							
+						var x:int = (i % boardWidth) * tileSize;
+						var y:int = (i / boardHeight) * tileSize;
+						
+						var effect:MovieClip = new effect_1();
+						effect.x = x + 50;
+						effect.y = y + 60;
+						effect.play();
+						effects.addChild(effect);
+					}
+					
+					TweenLite.to(effects, 0.9, {  onComplete:function():void {
+						while(effects.numChildren)
+							effects.removeChildAt(0);
+					}});
+					
+					//gameBoard.update(true);
+					//gameBoard.fill();
+					doFall = true;
+				}
+			}
+			swipeSeq.clear();
+			
+			turns--;
+			nextTurn = seconds + turnTime;
+		}
+		
 		public function _init(e:Event = null):void {
 			
 			
@@ -109,34 +180,7 @@ package
 				swipeSeq.start(e.stageX, e.stageY);
 			});
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
-				swipeSeq.end();
-				if(swipeSeq.length() >= 3) {
-					
-					if(gameLogic.handleSequence(swipeSeq)) {
-						gameBoard.remove(swipeSeq);
-						
-						for each(var i:int in swipeSeq.getIndexes()) {							
-							var x:int = (i % boardWidth) * tileSize;
-							var y:int = (i / boardHeight) * tileSize;
-							
-							var effect:MovieClip = new effect_1();
-							effect.x = x + 50;
-							effect.y = y + 60;
-							effect.play();
-							effects.addChild(effect);
-						}
-						
-						TweenLite.to(effects, 0.9, {  onComplete:function():void {
-							while(effects.numChildren)
-								effects.removeChildAt(0);
-						}});
-						
-						//gameBoard.update(true);
-						//gameBoard.fill();
-						swipeSeq.clear()
-						doFall = true;
-					}
-				}
+				endSwipe();
 			});
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
 				if(e.buttonDown)
@@ -147,30 +191,52 @@ package
 			
 			gameBoard.update(true);
 			
-		}
-		
-		public function onUpdate(e:Event):void {
-			gameBoard.drawLine(swipeSeq);					
+			nextTurn = turnTime;
 			
+		}
+				
+		public function onUpdate(e:Event):void {
+			
+			frame++;
+			
+			seconds = (frame / FPS);
+			
+			
+
+			gameBoard.drawLine(swipeSeq);			
 			
 			if(doFill && !gameBoard.isMoving()) {
-				gameLogic.doDamage();
 				gameBoard.update(true);
-				gameBoard.fill();
+				gameBoard.fill(swipeType == 1);
 				doFill = false;
 			}
 
 			if(doFall && !gameBoard.isMoving()) {
 				gameBoard.update(true);
-				gameBoard.fall();
+				if(swipeType == 1)
+					gameBoard.rise();
+				else
+					gameBoard.fall();
 				doFall = false;
 				doFill = true;
 			}
 			
 			gameBoard.update();
 			
+			var score:int = 0;
 			for(var i:int = 0; i<3; i++) {
-				honeyText[i].text = gameLogic.getHoney(i).toString();
+				score += gameLogic.getHoney(i);
+				//honeyText[i].text = gameLogic.getHoney(i).toString();
+			}
+			
+			scoreText.text = score.toString();
+
+			
+			turnText.text = turns.toString();
+			timeText.text = (nextTurn - seconds).toString();
+			
+			if(nextTurn <= seconds) {
+				endSwipe();
 			}
 			
 			

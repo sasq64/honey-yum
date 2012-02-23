@@ -143,7 +143,8 @@ package {
 						
 						//gameTiles[i].remove();
 						gameTiles[i].moveTo(tx-x, ty-y,true);
-						gameTiles[i].fadeTo(0);
+						//gameTiles[i].fadeTo(0);
+						gameTiles[i].remove();
 						//gameTiles[i] = null;
 					} else {
 						gameTiles[i].remove();
@@ -171,15 +172,41 @@ package {
 			doUpdate = true;
 		}
 		
-		public function fill():void
+		
+		public function rise():void {
+			trace("## RISING");
+			//return;
+			for(var x:int=0; x<width; x++) {
+				for(var y:int=0; y<height-1; y++) {					
+					//var t:GameTile = gameTiles[x+y*width];
+					var yy:int = y;
+					while(yy >= 0 && gameTiles[x+(yy+1)*width] && !gameTiles[x+(yy)*width]) {
+						gameTiles[x+(yy+1)*width].fall(-tileSize);
+						gameTiles[x+(yy)*width] = gameTiles[x+(yy+1)*width];
+						gameTiles[x+(yy+1)*width] = null;
+						yy--;
+					}							
+				}
+			}
+			doUpdate = true;
+		}
+		
+		public function fill(fromBottom:Boolean):void
 		{
 			for(var x:int=0; x<width; x++) {
 				for(var y:int=height-1; y>=0; y--) {
 					var i:int = x+ y*width;
 					if(!gameTiles[i]) {
-						var r:int = (Math.random() * tiles.length);				
+						var r:int;
+						if(fromBottom)
+							r= (Math.random() * tiles.length);
+						else
+							r = (Math.random() * 3);
 						gameTiles[i] = new GameTile(tiles[r]);
-						gameTiles[i].fall(40*y + 40);
+						if(fromBottom)
+							gameTiles[i].rise(40*y + 40);
+						else
+							gameTiles[i].fall(40*y + 40);
 					}
 				}
 			}
@@ -236,7 +263,7 @@ package {
 				var direction = getDirection(position, nextPosition);
 			}
 			
-			doUpdate = true;
+			doUpdate = swipeSeq.length() > 0;
 		}
 		
 		public function getDirection(position:Point, nextPosition:Point):String {

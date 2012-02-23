@@ -13,16 +13,20 @@ package {
 
 		
 		private var honey:Array = [0,0,0];//new Array();
+		private var turns:int;
+		private var turnTime:int;
 
-		public function GameLogic(gb:GameBoard) {						
+		public function GameLogic(gb:GameBoard, tt:int, t:int) {						
 			gameBoard = gb;
+			turns = t;
+			turnTime = tt;
 		}
 		
 		public function getHoney(i:int):int {
 			return honey[i];
 		}
 		
-		public function handleSequence(swipeSeq:SwipeSequence):Boolean {
+		public function handleSequence(swipeSeq:SwipeSequence):int {
 		
 			var indexes:Vector.<int> = swipeSeq.getIndexes();
 			
@@ -42,7 +46,7 @@ package {
 				
 				honey[t-1] += count + bonus;
 				
-				return true;
+				return 1;
 			}	
 			
 			// Handle attack
@@ -56,10 +60,10 @@ package {
 					flowers++;
 			} */
 			
-			return true; //(flowers >= bees);
+			return 2; //(flowers >= bees);
 		}
 		
-		public function doDamage():void {
+		public function doTurn():void {
 			/*var bees:int = gameBoard.countTiles(BEE);
 			for(var i:int = 0; i<3 ; i++) {
 				honey[i] -= bees;

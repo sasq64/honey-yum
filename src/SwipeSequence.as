@@ -24,7 +24,7 @@ package
 			seq = new Vector.<int>();
 		}
 		
-		private static var padding:Number = 0.3;
+		private static var padding:Number = 0.2;
 		
 		private function calc(x:int, y:int):int {
 			var tx:int = (x / tileWidth);

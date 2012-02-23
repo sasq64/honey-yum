@@ -66,6 +66,16 @@ package {
 			}});
 		}
 		
+		public function rise(dist:Number):void {
+			
+			var that:GameTile = this;
+			moving |= 1;
+			dy += dist;
+			TweenLite.to(this, 1.0, { dy:0, ease:Bounce.easeOut, onComplete:function():void {
+				that.moving &= ~1;
+			}});
+		}
+
 		public function moveTo(x:int, y:int, removeIt:Boolean = false):void {
 			moving |= 2;
 			TweenLite.to(this, 1.0, { dx:x, dy:y, ease:Back.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
