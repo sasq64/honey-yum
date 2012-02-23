@@ -149,7 +149,7 @@ package
 					for each(var i:int in swipeSeq.getIndexes()) {							
 						var x:int = (i % boardWidth) * tileSize;
 						var y:int = (i / boardHeight) * tileSize;
-						
+
 						var effect:MovieClip = new effect_1();
 						effect.x = x + 50;
 						effect.y = y + 60;
@@ -203,7 +203,7 @@ package
 			
 			
 
-			gameBoard.drawLine(swipeSeq);			
+			gameBoard.drawLine(swipeSeq, effects);			
 			
 			if(doFill && !gameBoard.isMoving()) {
 				gameBoard.update(true);

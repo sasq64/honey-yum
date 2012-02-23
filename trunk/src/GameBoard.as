@@ -1,12 +1,12 @@
 package {
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
-	import flash.filters.DisplacementMapFilterMode;
 	import flash.display.MovieClip;
-	import flash.utils.Dictionary;
-	import flash.geom.Point;
 	import flash.display.Sprite;
+	import flash.filters.DisplacementMapFilterMode;
 	import flash.filters.DropShadowFilter;
+	import flash.geom.Point;
+	import flash.utils.Dictionary;
 
 	public class GameBoard {
 		
@@ -19,6 +19,7 @@ package {
 		private var gameTiles:Vector.<GameTile>;
 		private var lineTiles:Vector.<LineTile>;		
 		private var tileSize:int;
+		private var dict:Dictionary;		
 		
 		public function getWidth():int { return width; }
 		public function getHeight():int { return height; }
@@ -53,6 +54,17 @@ package {
 			}
 			
 			lineTiles = new Vector.<LineTile>(w*h);	
+			
+			dict = new Dictionary();
+			var counter:int = 0;
+			
+			// Move to game board init
+			for(var y:int=0; y<height; y++) {
+				for(var x:int=0; x<width; x++) {
+					dict[counter] = new Point(x, y);
+					counter++;
+				}
+			}			
 		}
 		
 		public function isMoving():Boolean {
@@ -224,7 +236,7 @@ package {
 			return count;
 		}
 		
-		public function drawLine(swipeSeq:SwipeSequence):void {
+		public function drawLine(swipeSeq:SwipeSequence, effects:MovieClip):void {
 			// Remove all lines
 			lineTiles = new Vector.<LineTile>(width * height);				
 			while(lineContainer.numChildren) {
@@ -237,6 +249,15 @@ package {
 				var tileNo:int = seq[x];
 				var position:Point = getPosition(tileNo);
 				var nextPosition:Point = null;
+
+				// Adding tile marked effect
+				var effect:MovieClip = new plate_effect_2();
+				effect.x = position.x * tileSize + (tileSize/2);
+				effect.y = position.y * tileSize + (tileSize/2);
+				effect.scaleX = 0.7;
+				effect.scaleY = 0.7;
+				effect.play();
+				effects.addChild(effect);				
 				
 				var next:int = x + 1;
 				if (next < seq.length) {
@@ -306,16 +327,8 @@ package {
 		}
 		
 		public function getPosition(tileNo:int):Point {
-			var dict:Dictionary = new Dictionary();
-			var counter:int = 0;
-			
-			// Move to game board init
-			for(var y:int=0; y<height; y++) {
-				for(var x:int=0; x<width; x++) {
-					dict[counter] = new Point(x, y);
-					counter++;
-				}
-			}
+
+
 			
 			return dict[tileNo];
 		}
