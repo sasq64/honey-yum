@@ -11,6 +11,8 @@ package
 		private var downY:Number;
 		
 		private var swipeSeq:SwipeSequence;
+		private var doFill:Boolean;
+		private var doFall:Boolean;
 		
 		public function Main() {
 
@@ -21,7 +23,11 @@ package
 				new Tile(new ballOrange()),
 			];
 			
-			gameBoard = new GameBoard(6,6, tiles);
+			for each(var t:Tile in tiles) {
+				(t.dob as MovieClip).stop();
+			}
+			
+			gameBoard = new GameBoard(this,6,6, tiles);
 			swipeSeq = new SwipeSequence(6, 6, 40, 40);
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		}
@@ -34,6 +40,13 @@ package
 			});
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
 				swipeSeq.end();
+				if(swipeSeq.length()) {
+					gameBoard.remove(swipeSeq);
+					//gameBoard.update(true);
+					//gameBoard.fill();
+					swipeSeq.clear()
+					doFall = true;
+				}
 			});
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
 				if(e.buttonDown)
@@ -42,13 +55,28 @@ package
 			
 			addEventListener(Event.ENTER_FRAME, onUpdate);
 			
+			gameBoard.update(true);
 			
-			
-			
-			gameBoard.addChildren(this);
 		}
 		
 		public function onUpdate(e:Event):void {
+			
+			if(doFill && !gameBoard.isMoving()) {
+				gameBoard.update(true);
+				gameBoard.fill();
+				doFill = false;
+			}
+
+			if(doFall && !gameBoard.isMoving()) {
+				gameBoard.update(true);
+				gameBoard.fall();
+				doFall = false;
+				doFill = true;
+			}
+			
+			gameBoard.update();
+			
+			
 			
 			if(swipeSeq.length() > 0) {
 				trace(swipeSeq.toString());

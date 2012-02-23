@@ -58,5 +58,13 @@ package
 		
 		public function end():void {
 		}
+		
+		public function getIndexes():Vector.<int> {
+			return seq;
+		}
+		
+		public function clear():void {
+			seq = new Vector.<int>();
+		}
 	}
 }
