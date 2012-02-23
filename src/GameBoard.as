@@ -62,7 +62,7 @@ package {
 			
 			for(var y:int=0; y<height; y++) {
 				for(var x:int=0; x<width; x++) {
-					dict[counter] = new Point(x, y);
+					dict[counter] = new Point(x * tileSize + (tileSize/2), y * tileSize + (tileSize/2));
 					counter++;
 				}
 			}
@@ -266,8 +266,8 @@ package {
 
 				// Adding tile marked effect
 				var effect:MovieClip = new plate_effect_2();
-				effect.x = position.x * tileSize + (tileSize/2);
-				effect.y = position.y * tileSize + (tileSize/2);
+				effect.x = position.x;
+				effect.y = position.y;
 				effect.scaleX = 0.7;
 				effect.scaleY = 0.7;
 				effect.play();
@@ -279,9 +279,9 @@ package {
 					nextPosition = getPosition(nextLineNo);		
 					var sp:Sprite = new Sprite;
 					lineContainer.addChild(sp);
-					sp.graphics.moveTo(position.x * tileSize + (tileSize/2), position.y * tileSize + (tileSize/2));
+					sp.graphics.moveTo(position.x, position.y);
 					sp.graphics.lineStyle(5, 0xffffff);
-					sp.graphics.lineTo(nextPosition.x * tileSize + (tileSize/2), nextPosition.y * tileSize + (tileSize/2));
+					sp.graphics.lineTo(nextPosition.x, nextPosition.y);
 					sp.filters = filtersArray;				
 				}
 			}
