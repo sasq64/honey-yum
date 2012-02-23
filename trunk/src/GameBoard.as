@@ -2,6 +2,7 @@ package {
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
 	import flash.filters.DisplacementMapFilterMode;
+	import flash.display.MovieClip;
 	import flash.utils.Dictionary;
 	import flash.geom.Point;
 	import flash.display.Sprite;
@@ -56,8 +57,10 @@ package {
 		
 		public function isMoving():Boolean {
 			for(var i:int=0; i<width*height; i++) {
-				if(gameTiles[i] && gameTiles[i].moving)
+				if(gameTiles[i] && gameTiles[i].moving > 0) {
+					trace("Tile ",i,"is moving", gameTiles[i].moving);
 					return true;
+				}
 			}
 			return false;
 		}
@@ -99,11 +102,52 @@ package {
 		}
 		
 		
-		public function remove(swipeSeq:SwipeSequence):void {			
+		public function remove(swipeSeq:SwipeSequence):void {
+			
+			var bees:Vector.<int> = new Vector.<int>();
+			
+			for(var i:int=0; i<width*height; i++) {
+				var gt:GameTile = gameTiles[i];
+				if(gt && gt.getTile().type == GameLogic.BEE) {
+					bees.push(i);
+				}
+			}
+						
+			
 			for each(var i:int in swipeSeq.getIndexes()) {
+								
 				if(gameTiles[i]) {
-					gameTiles[i].remove();
-					//gameTiles[i] = null;
+					
+					var tp:int = gameTiles[i].getTile().type;
+
+					var x:int = (i % width) * tileSize;
+					var y:int = (i / width) * tileSize;
+
+					var effect:MovieClip = new effect_1();
+					effect.x = x;
+					effect.y = y;
+					effect.play();
+					parent.addChild(effect);
+					
+					if(tp >= GameLogic.HONEY0 && tp <= GameLogic.HONEY2) {
+
+						var tx:int = 1000;
+						var ty:int = 150;
+						
+						if(bees.length) {
+							var j:int = bees.pop();
+							tx = (j % width) * tileSize;
+							ty = (j / width) * tileSize;						
+						}
+						
+						
+						//gameTiles[i].remove();
+						gameTiles[i].moveTo(tx-x, ty-y,true);
+						gameTiles[i].fadeTo(0);
+						//gameTiles[i] = null;
+					} else {
+						gameTiles[i].remove();
+					}
 				}
 			}
 			doUpdate = true;

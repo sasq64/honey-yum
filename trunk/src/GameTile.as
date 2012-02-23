@@ -15,7 +15,7 @@ package {
 		private var bitmap:Bitmap;
 		private var tile:Tile;
 		//public var empty:Boolean;
-		public var moving:Boolean;
+		public var moving:int;
 		public var removeMe:Boolean;
 		public var dx:Number;
 		public var dy:Number;
@@ -28,13 +28,14 @@ package {
 			bitmap = new Bitmap(bm);
 			//empty = false;
 			dx = dy = 0;
+			moving = 0;
 		}
 		
 		public function getDisplayObject():DisplayObject {
 			return bitmap;
 		}
 		
-		public function setTile(t:Tile):void {
+		public function setTileX(t:Tile):void {
 			tile = t;
 			var bm:BitmapData = new BitmapData(t.dob.width, t.dob.height);
 			var r:Rectangle = t.dob.getBounds(t.dob);
@@ -56,21 +57,40 @@ package {
 		}
 		
 		public function fall(dist:Number):void {
-			this.moving = true;
+
+			var that:GameTile = this;
+			moving |= 1;
 			dy -= dist;
-			TweenLite.to(this, 1.0, { dy:0, ease:Bounce.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
-				gt.moving = false;
+			TweenLite.to(this, 1.0, { dy:0, ease:Bounce.easeOut, onComplete:function():void {
+				that.moving &= ~1;
 			}});
 		}
 		
+		public function moveTo(x:int, y:int, removeIt:Boolean = false):void {
+			moving |= 2;
+			TweenLite.to(this, 1.0, { dx:x, dy:y, ease:Back.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
+				gt.moving &= ~2;
+				gt.removeMe = removeIt;
+			}});
+			
+		}
+
+		public function fadeTo(to:int):void {
+			this.moving |= 4;
+			TweenLite.to(bitmap, 1.0, { scaleX:0, scaleY:0, ease:Back.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
+				gt.moving &= ~4;
+			}});
+		}
+
+			
 		public function remove():void {
-			this.moving = true;
+			this.moving |= 8;
 			TweenLite.to(bitmap, 0.5, { scaleX:0, scaleY:0, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
 				trace("COMPLETE");
-				gt.moving = false;
+				gt.moving &= ~8;
 				gt.removeMe = true;
 			}});			
-			TweenLite.to(this, 0.5, { dy:(bitmap.width/2), dx:(bitmap.height/2) });
+			//TweenLite.to(this, 0.5, { dy:(bitmap.width/2), dx:(bitmap.height/2) });
 		}
 		
 	}

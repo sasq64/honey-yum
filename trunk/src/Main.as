@@ -1,5 +1,8 @@
 package
 {
+	import com.greensock.TweenLite;
+	
+	import flash.display.Bitmap;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -25,24 +28,39 @@ package
 		private var gameBoardContainer:MovieClip;
 		private var lineContainer:MovieClip;				
 		private var honeyText:Array;
+		private var effects:MovieClip;
 		
 		public function Main() {
 
 			var tiles:Array = [
-				new Tile(new balloon(), GameLogic.FLOWER),
+				new Tile(new flower_1(), GameLogic.FLOWER0),
+				new Tile(new flower_2(), GameLogic.FLOWER1),
+				new Tile(new bee(), GameLogic.BEE),
+				new Tile(new honeyJar_blue, GameLogic.HONEY0),
+				new Tile(new honeyJar_green(), GameLogic.HONEY1),
+				new Tile(new honeyJar_red(), GameLogic.HONEY2), /*
+				new Tile(new balloon(), GameLogic.FLOWER0),
 				new Tile(new sealionHead(), GameLogic.BEE),
 				new Tile(new ballGreen(), GameLogic.HONEY0),
 				new Tile(new ballBlue(), GameLogic.HONEY1),
-				new Tile(new ballOrange(), GameLogic.HONEY2),
+				new Tile(new ballOrange(), GameLogic.HONEY2) */
 			];
 
 			tileSize = 120;
 			padding = 5;
 			boardWidth = 6;
 			boardHeight = 6;
+			
+			var bm:Bitmap = new Bitmap(new background());
+			bm.smoothing = true;
+			bm.scaleX = stage.stageWidth / bm.width;
+			bm.scaleY = stage.stageHeight / bm.height;
 
+			addChild(bm);
+						
 			for each(var t:Tile in tiles) {
-				(t.dob as MovieClip).stop();
+				if(t.dob is MovieClip)
+					(t.dob as MovieClip).stop();
 				t.dob.scaleX = (tileSize - padding) / t.dob.width;
 				t.dob.scaleY = (tileSize - padding) / t.dob.height;
 			}
@@ -71,6 +89,15 @@ package
 				addChild(tf);
 			}
 
+			effects = new MovieClip();
+			addChild(effects);
+			
+			//var mc:MovieClip = new effect_1();
+			//mc.x = 100;
+			//mc.y = 100;
+			//mc.play();
+			//addChild(mc);
+
 			
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		}
@@ -83,10 +110,27 @@ package
 			});
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
 				swipeSeq.end();
-				if(swipeSeq.length()) {
+				if(swipeSeq.length() >= 3) {
 					
 					if(gameLogic.handleSequence(swipeSeq)) {
 						gameBoard.remove(swipeSeq);
+						
+						for each(var i:int in swipeSeq.getIndexes()) {							
+							var x:int = (i % boardWidth) * tileSize;
+							var y:int = (i / boardHeight) * tileSize;
+							
+							var effect:MovieClip = new effect_1();
+							effect.x = x + 50;
+							effect.y = y + 60;
+							effect.play();
+							effects.addChild(effect);
+						}
+						
+						TweenLite.to(effects, 0.9, {  onComplete:function():void {
+							while(effects.numChildren)
+								effects.removeChildAt(0);
+						}});
+						
 						//gameBoard.update(true);
 						//gameBoard.fill();
 						swipeSeq.clear()
