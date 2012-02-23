@@ -7,6 +7,7 @@ package {
 	import flash.filters.DropShadowFilter;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
+	import flash.filters.GlowFilter;
 
 	public class GameBoard {
 		
@@ -20,6 +21,7 @@ package {
 		private var lineTiles:Vector.<LineTile>;		
 		private var tileSize:int;
 		private var dict:Dictionary;		
+		private var filtersArray:Array;		
 		
 		public function getWidth():int { return width; }
 		public function getHeight():int { return height; }
@@ -58,13 +60,25 @@ package {
 			dict = new Dictionary();
 			var counter:int = 0;
 			
-			// Move to game board init
 			for(var y:int=0; y<height; y++) {
 				for(var x:int=0; x<width; x++) {
 					dict[counter] = new Point(x, y);
 					counter++;
 				}
-			}			
+			}
+			
+			// Filters for line
+			var dropShadow:DropShadowFilter = new DropShadowFilter();
+			dropShadow.color = 0x000000;
+			dropShadow.blurX = 10;
+			dropShadow.blurY = 10;
+			dropShadow.angle = 0;
+			dropShadow.alpha = 0.5;
+			dropShadow.distance = 10;
+			filtersArray = new Array(dropShadow);
+			// color, alpha (transparency), blurX, blurY, strength (intensity), quality (low, med, high), inner knock out
+			var glowFilter:GlowFilter = new GlowFilter(0xFF6699, .75, 5, 5, 2, 2, false, false);
+			filtersArray.push(glowFilter);
 		}
 		
 		public function isMoving():Boolean {
@@ -268,20 +282,8 @@ package {
 					sp.graphics.moveTo(position.x * tileSize + (tileSize/2), position.y * tileSize + (tileSize/2));
 					sp.graphics.lineStyle(5, 0xffffff);
 					sp.graphics.lineTo(nextPosition.x * tileSize + (tileSize/2), nextPosition.y * tileSize + (tileSize/2));
-					
-					var dropShadow:DropShadowFilter = new DropShadowFilter();
-					dropShadow.color = 0x000000;
-					dropShadow.blurX = 10;
-					dropShadow.blurY = 10;
-					dropShadow.angle = 0;
-					dropShadow.alpha = 0.5;
-					dropShadow.distance = 10;
-					
-					var filtersArray:Array = new Array(dropShadow);
 					sp.filters = filtersArray;				
 				}
-				
-				var direction = getDirection(position, nextPosition);
 			}
 			
 			doUpdate = swipeSeq.length() > 0;
