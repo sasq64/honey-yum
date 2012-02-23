@@ -62,7 +62,7 @@ package
 			padding = 5;
 			boardWidth = 6;
 			boardHeight = 6;
-			turnTime = 10;
+			turnTime = 30;
 			turns = 10;
 			
 			var bm:Bitmap = new Bitmap(new background());
@@ -230,8 +230,17 @@ package
 					gameBoard.rise();
 				else
 					gameBoard.fall();
+				if(swipeType != 3) {						
+					doFill = true;
+				} else {
+					var xc:int = gameBoard.countHoney();
+					if(xc == 0) {
+						trace("#### CLEAR ALL!");
+						gameLogic.giveScore(1000);
+						doFill = true;
+					}
+				}
 				doFall = false;
-				doFill = true;
 			}
 			
 			gameBoard.update();

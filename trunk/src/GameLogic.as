@@ -30,7 +30,13 @@ package {
 		
 			var indexes:Vector.<int> = swipeSeq.getIndexes();
 			
-			var first:GameTile = gameBoard.getTile(indexes[0]);
+			var first:GameTile = null;
+			var i:int = 0;
+			while(!first) {
+				first = gameBoard.getTile(indexes[i++]);
+				if(i >= indexes.length)
+					return 0;
+			}
 			var t:int = first.getTile().type;
 			
 			if(t >= HONEY0 && t <= HONEY2) {

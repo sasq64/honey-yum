@@ -150,11 +150,11 @@ package {
 					var x:int = (i % width) * tileSize;
 					var y:int = (i / width) * tileSize;
 
-					var effect:MovieClip = new small_EFFECT();
+					/*var effect:MovieClip = new small_EFFECT();
 					effect.x = x;
 					effect.y = y;
 					effect.play();
-					parent.addChild(effect);
+					parent.addChild(effect);*/
 					
 					if(tp >= GameLogic.HONEY0 && tp <= GameLogic.HONEY2) {
 
@@ -164,14 +164,15 @@ package {
 						if(bees.length) {
 							var j:int = bees.pop();
 							tx = (j % width) * tileSize;
-							ty = (j / width) * tileSize;						
+							ty = (j / width) * tileSize;// + tileSize/2;
 						}
-						
-						
+						tx += (tileSize/2);
+						ty += (tileSize/2);
+												
 						//gameTiles[i].remove();
+						gameTiles[i].fadeTo(0);
 						gameTiles[i].moveTo(tx-x, ty-y,true);
-						//gameTiles[i].fadeTo(0);
-						gameTiles[i].remove();
+						//gameTiles[i].remove();
 						//gameTiles[i] = null;
 					} else {
 						gameTiles[i].remove();
@@ -264,10 +265,16 @@ package {
 		
 		public function drawLine(swipeSeq:SwipeSequence, effects:MovieClip):void {
 			// Remove all lines
+			//return;
 			lineTiles = new Vector.<LineTile>(width * height);				
 			while(lineContainer.numChildren) {
 				lineContainer.removeChildAt(0);
 			}
+
+			//while(effects.numChildren)
+			//	effects.removeChildAt(0);
+			
+			trace("%%%%", effects.numChildren);
 
 			// And draw new
 			var sprite:Sprite = new Sprite;
