@@ -78,7 +78,9 @@ package {
 
 		public function moveTo(x:int, y:int, removeIt:Boolean = false):void {
 			moving |= 2;
-			TweenLite.to(this, 1.0, { dx:x, dy:y, ease:Back.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
+			dx = 0;
+			dy = 0;
+			TweenLite.to(this, 1.0, { dx:x, dy:y, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
 				gt.moving &= ~2;
 				gt.removeMe = removeIt;
 			}});
