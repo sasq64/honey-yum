@@ -8,12 +8,19 @@ package
 		private var tileHeight:int;
 		private var seq:Vector.<int>;
 		private var lastTile:int;
+		private var gameBoard:GameBoard;
+		private var lastType:int;
 
-		public function SwipeSequence(w:int, h:int, tw:int, th:int) {
-			width = w;
-			height = h;
-			tileWidth = tw;
-			tileHeight = th;
+		public function SwipeSequence(gb:GameBoard) {//w:int, h:int, tw:int, th:int) {
+			
+			gameBoard = gb;
+			width = gb.getWidth();
+			height = gb.getHeight();
+			tileWidth = tileHeight = gb.getTileSize();			
+			//width = w;
+			//height = h;
+			//tileWidth = tw;
+			//tileHeight = th;
 			seq = new Vector.<int>();
 		}
 		
@@ -29,12 +36,21 @@ package
 		public function start(x:Number, y:Number):void {
 			seq = new Vector.<int>();
 			lastTile = -1;
+			lastType = -1;
 			add(x,y);
 		}
 		
 		public function add(x:Number, y:Number):void {
 			var tileNo:int = calc(x,y);
 			if(tileNo >= 0 && tileNo != lastTile) {
+
+				var gt:GameTile = gameBoard.getTile(tileNo);
+				if(lastType >= 0 && gt.getTile().type != lastType) {
+					return;
+				}
+				
+				lastType = gt.getTile().type;
+				
 				
 				for(var i:int=0; i<seq.length; i++) {
 					if(seq[i] == tileNo) {

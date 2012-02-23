@@ -11,12 +11,32 @@ package {
 		private var parent:DisplayObjectContainer;
 		private var doUpdate:Boolean;
 		private var gameTiles:Vector.<GameTile>;
+		private var tileSize:int;
 		
-		public function GameBoard(parent:DisplayObjectContainer, w:int, h:int, tiles:Array) {
+		public function getWidth():int { return width; }
+		public function getHeight():int { return height; }
+		public function getTileSize():int { return tileSize; }
+		
+		public function getTiles():Vector.<int> {
+			
+			for(var i:int=0; i<width*height; i++) {
+				
+			}
+			return null;
+		}
+		
+		public function getTile(i:int, j:int = -1):GameTile {
+			if(j != -1) i += j*width;
+			return gameTiles[i];
+		}
+
+		
+		public function GameBoard(parent:DisplayObjectContainer, w:int, h:int, tsize:int, tiles:Array) {
 			width = w;
 			height = h;
 			this.tiles = tiles;
 			this.parent = parent;
+			tileSize = tsize;
 			
 			gameTiles = new Vector.<GameTile>(w*h);
 			for(var i:int=0; i<w*h; i++) {				
@@ -51,7 +71,7 @@ package {
 						if(gameTiles[y*width+x].removeMe)
 							gameTiles[y*width+x] = null;
 						else
-							gameTiles[y*width+x].update(parent, x*40, y*40);
+							gameTiles[y*width+x].update(parent, x*tileSize, y*tileSize);
 					}
 					/*if(dob) {
 						dob.x = x*40;
@@ -84,7 +104,7 @@ package {
 					//var t:GameTile = gameTiles[x+y*width];
 					var yy:int = y;
 					while(yy < height-1 && gameTiles[x+(yy)*width] && !gameTiles[x+(yy+1)*width]) {
-						gameTiles[x+(yy)*width].fall(40);
+						gameTiles[x+(yy)*width].fall(tileSize);
 						gameTiles[x+(yy+1)*width] = gameTiles[x+(yy)*width];
 						gameTiles[x+(yy)*width] = null;
 						yy++;
@@ -108,5 +128,6 @@ package {
 			}
 			doUpdate = true;
 		}
+		
 	}
 }

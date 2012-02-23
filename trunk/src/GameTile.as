@@ -1,5 +1,8 @@
 package {
 	import com.greensock.TweenLite;
+	import com.greensock.easing.Back;
+	import com.greensock.easing.Bounce;
+	import com.greensock.easing.EaseLookup;
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -20,7 +23,7 @@ package {
 			tile = t;
 			var bm:BitmapData = new BitmapData(t.dob.width, t.dob.height, true, 0);
 			var r:Rectangle = t.dob.getBounds(t.dob);
-			var m:Matrix = new Matrix(1,0,0,1,-r.left, -r.top);
+			var m:Matrix = new Matrix(t.dob.scaleX,0,0,t.dob.scaleY,-r.left * t.dob.scaleX , -r.top * t.dob.scaleY);
 			bm.draw(t.dob, m);
 			bitmap = new Bitmap(bm);
 			//empty = false;
@@ -55,24 +58,19 @@ package {
 		public function fall(dist:Number):void {
 			this.moving = true;
 			dy -= dist;
-			TweenLite.to(this, 1.0, { dy:0, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
+			TweenLite.to(this, 1.0, { dy:0, ease:Bounce.easeOut, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
 				gt.moving = false;
 			}});
 		}
 		
 		public function remove():void {
 			this.moving = true;
-			TweenLite.to(bitmap, 1.0, { scaleX:0, scaleY:0, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
+			TweenLite.to(bitmap, 0.5, { scaleX:0, scaleY:0, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
 				trace("COMPLETE");
 				gt.moving = false;
 				gt.removeMe = true;
-			}});
-			//TweenLite.to(this, 1.0, { dx:500, dy:500, onCompleteParams:[this], onComplete:function(gt:GameTile):void {
-			//	gt.moving = false;
-			//}});
-
-			//tile = null;
-			//empty = true;
+			}});			
+			TweenLite.to(this, 0.5, { dy:(bitmap.width/2), dx:(bitmap.height/2) });
 		}
 		
 	}
