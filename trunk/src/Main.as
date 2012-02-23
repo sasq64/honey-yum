@@ -146,13 +146,26 @@ package
 				if(swipeType) {
 					gameBoard.remove(swipeSeq);
 					
+					var len:int = swipeSeq.getIndexes().length;
+					
 					for each(var i:int in swipeSeq.getIndexes()) {							
 						var x:int = (i % boardWidth) * tileSize;
 						var y:int = (i / boardHeight) * tileSize;
 
-						var effect:MovieClip = new small_EFFECT();
-						effect.x = x + 50;
-						effect.y = y + 60;
+						var effect:MovieClip;
+						if (swipeType == 3) {
+							effect = new large_EFFECT();							
+							effect.x = x + (tileSize/2);
+							effect.y = y;														
+						} else if (len < 8) {
+							effect = new small_EFFECT();
+							effect.x = x + (tileSize/2);
+							effect.y = y + (tileSize/2);
+						} else if (len >= 8) {
+							effect = new medium_EFFECT();							
+							effect.x = x + (tileSize/2);
+							effect.y = y;							
+						}
 						effect.play();
 						effects.addChild(effect);
 					}
