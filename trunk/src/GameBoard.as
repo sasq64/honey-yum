@@ -129,5 +129,15 @@ package {
 			doUpdate = true;
 		}
 		
+		public function countTiles(type:int):int
+		{
+			var count:int = 0;
+			for(var i:int=0; i<width*height; i++) {
+				if(gameTiles[i] && gameTiles[i].getTile().type == type) {
+					count++;
+				}
+			}
+			return count;
+		}
 	}
 }

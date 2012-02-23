@@ -4,6 +4,9 @@ package
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.text.TextField;
+	import flash.text.TextFieldType;
+	import flash.text.TextFormat;
 	
 	[SWF(width='1024', height='768', backgroundColor='#000000', frameRate=60)]
 	public class Main extends Sprite {
@@ -18,14 +21,18 @@ package
 		private var padding:int;
 		private var boardWidth:int;
 		private var boardHeight:int;
+		private var gameLogic:GameLogic;
+		private var gameBoardContainer:MovieClip;
+		private var honeyText:Array;
 		
 		public function Main() {
 
 			var tiles:Array = [
-				new Tile(new ballBlue(), 0),
-				new Tile(new ballGreen(), 1),
-				new Tile(new ballMagenta(), 2),
-				new Tile(new ballOrange(), 3),
+				new Tile(new balloon(), GameLogic.FLOWER),
+				new Tile(new sealionHead(), GameLogic.BEE),
+				new Tile(new ballGreen(), GameLogic.HONEY0),
+				new Tile(new ballBlue(), GameLogic.HONEY1),
+				new Tile(new ballOrange(), GameLogic.HONEY2),
 			];
 
 			tileSize = 120;
@@ -38,10 +45,29 @@ package
 				t.dob.scaleX = (tileSize - padding) / t.dob.width;
 				t.dob.scaleY = (tileSize - padding) / t.dob.height;
 			}
+					
+			gameBoardContainer = new MovieClip();
+			addChild(gameBoardContainer);
 			
-			
-			gameBoard = new GameBoard(this, boardWidth, boardHeight, tileSize, tiles);
+			gameBoard = new GameBoard(gameBoardContainer, boardWidth, boardHeight, tileSize, tiles);
 			swipeSeq = new SwipeSequence(gameBoard); //boardWidth, boardHeight, tileSize, tileSize);
+			
+			gameLogic = new GameLogic(gameBoard);
+			
+			honeyText = [ new TextField(), new TextField(), new TextField() ];
+			var i:int = 0;
+			for each(var tf:TextField in honeyText) {
+				tf.y = 20;
+				tf.x = 50 + 100 * i++;
+				tf.defaultTextFormat = new TextFormat("Arial", 32, 0xffffffff, true);
+				tf.mouseEnabled = false;
+				tf.type = TextFieldType.DYNAMIC;
+				tf.text = '0';
+				tf.textColor = 0xffffffff;
+				addChild(tf);
+			}
+
+			
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		}
 		
@@ -54,11 +80,14 @@ package
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
 				swipeSeq.end();
 				if(swipeSeq.length()) {
-					gameBoard.remove(swipeSeq);
-					//gameBoard.update(true);
-					//gameBoard.fill();
-					swipeSeq.clear()
-					doFall = true;
+					
+					if(gameLogic.handleSequence(swipeSeq)) {
+						gameBoard.remove(swipeSeq);
+						//gameBoard.update(true);
+						//gameBoard.fill();
+						swipeSeq.clear()
+						doFall = true;
+					}
 				}
 			});
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
@@ -78,6 +107,7 @@ package
 				gameBoard.update(true);
 				gameBoard.fill();
 				doFill = false;
+				gameLogic.doDamage();
 			}
 
 			if(doFall && !gameBoard.isMoving()) {
@@ -89,6 +119,9 @@ package
 			
 			gameBoard.update();
 			
+			for(var i:int = 0; i<3; i++) {
+				honeyText[i].text = gameLogic.getHoney(i).toString();
+			}
 			
 			
 			if(swipeSeq.length() > 0) {
