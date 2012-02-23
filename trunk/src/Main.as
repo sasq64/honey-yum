@@ -59,10 +59,10 @@ package
 			];
 
 			tileSize = 100;
-			padding = 15;
+			padding = 5;
 			boardWidth = 6;
 			boardHeight = 6;
-			turnTime = 30;
+			turnTime = 10;
 			turns = 10;
 			
 			var bm:Bitmap = new Bitmap(new background());
@@ -150,7 +150,7 @@ package
 						var x:int = (i % boardWidth) * tileSize;
 						var y:int = (i / boardHeight) * tileSize;
 
-						var effect:MovieClip = new effect_1();
+						var effect:MovieClip = new small_EFFECT();
 						effect.x = x + 50;
 						effect.y = y + 60;
 						effect.play();
@@ -217,16 +217,8 @@ package
 					gameBoard.rise();
 				else
 					gameBoard.fall();
-				if(swipeType != 3) {						
-					doFill = true;
-				} else {
-					var xc:int = gameBoard.countHoney();
-					if(xc == 0) {
-						trace("#### CLEAR ALL!");
-						gameLogic.giveScore(1000);
-					}
-				}
 				doFall = false;
+				doFill = true;
 			}
 			
 			gameBoard.update();
