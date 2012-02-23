@@ -66,14 +66,13 @@ package
 
 				var gt:GameTile = gameBoard.getTile(tileNo);
 				
-				if(!gt) return;
-				
-				if(lastType >= 0 && (gt.getTile().type & 0xf) != lastType) {
-					return;
+				if(gt) {				
+					if(lastType >= 0 && (gt.getTile().type & 0xf) != lastType) {
+						return;
+					}
+					lastType = gt.getTile().type & 0xf;
 				}
-				
-				lastType = gt.getTile().type & 0xf;
-				
+					
 				
 				for(var i:int=0; i<seq.length; i++) {
 					if(seq[i] == tileNo) {

@@ -100,7 +100,7 @@ package {
 				gt.moving &= ~8;
 				gt.removeMe = true;
 			}});			
-			//TweenLite.to(this, 0.5, { dy:(bitmap.width/2), dx:(bitmap.height/2) });
+			TweenLite.to(this, 0.5, { dy:(bitmap.width/2), dx:(bitmap.height/2) });
 		}
 		
 	}

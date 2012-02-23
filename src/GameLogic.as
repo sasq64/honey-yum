@@ -37,30 +37,42 @@ package {
 				
 				var bees:int = gameBoard.countTiles(BEE);
 				var count:int = indexes.length - bees;
-				
+				if(count < 0) count = 0;
 				var bonus:int = 0;
-				if(indexes.length > 5)
+				if(count > 5)
 					bonus += (count - 5) * 3;
-				if(indexes.length > 8)
+				if(count > 8)
 					bonus += (count - 8) * 5;
 				
 				honey[t-1] += count + bonus;
 				
+				trace("REMOVED", t, indexes.length, gameBoard.countTiles(t));
+				if(indexes.length >= gameBoard.countTiles(t)) {
+					// Collected all
+					honey[t-1] += count * 5 + 100;
+					return 3;
+				}
+				
+				
 				return 1;
-			}	
+			}
+			
+			honey[0] += indexes.length;
 			
 			// Handle attack
-			/* var flowers:int = 0;
+			 var flowers:int = 0;
 			var bees:int = 0;
 			for each(var i:int in indexes) {
-				var gt:GameTile = gameBoard.getTile(i);				
-				if(gt.getTile().type == BEE)
-					bees++;
-				else
-					flowers++;
-			} */
+				var gt:GameTile = gameBoard.getTile(i);
+				if(gt) {
+					if(gt.getTile().type == BEE)
+						bees++;
+					else
+						flowers++;
+				}
+			}
 			
-			return 2; //(flowers >= bees);
+			return (bees > 0 && flowers >= bees) > 0 ? 2 : 0; //(flowers >= bees);
 		}
 		
 		public function doTurn():void {
@@ -68,6 +80,10 @@ package {
 			for(var i:int = 0; i<3 ; i++) {
 				honey[i] -= bees;
 			}*/			
+		}
+			
+		public function giveScore(score:int):void {
+			honey[0] += score;
 		}
 	}
 }

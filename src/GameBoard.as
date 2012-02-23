@@ -5,9 +5,9 @@ package {
 	import flash.display.Sprite;
 	import flash.filters.DisplacementMapFilterMode;
 	import flash.filters.DropShadowFilter;
+	import flash.filters.GlowFilter;
 	import flash.geom.Point;
 	import flash.utils.Dictionary;
-	import flash.filters.GlowFilter;
 
 	public class GameBoard {
 		
@@ -84,7 +84,7 @@ package {
 		public function isMoving():Boolean {
 			for(var i:int=0; i<width*height; i++) {
 				if(gameTiles[i] && gameTiles[i].moving > 0) {
-					trace("Tile ",i,"is moving", gameTiles[i].moving);
+//					/trace("Tile ",i,"is moving", gameTiles[i].moving);
 					return true;
 				}
 			}
@@ -97,7 +97,7 @@ package {
 				if(!isMoving()) return;
 			}
 			
-			trace("## UPDATE");
+			//trace("## UPDATE");
 			
 			while(parent.numChildren)
 				parent.removeChildAt(0);
@@ -149,7 +149,7 @@ package {
 					var x:int = (i % width) * tileSize;
 					var y:int = (i / width) * tileSize;
 
-					var effect:MovieClip = new effect_1();
+					var effect:MovieClip = new small_EFFECT();
 					effect.x = x;
 					effect.y = y;
 					effect.play();
@@ -250,6 +250,17 @@ package {
 			return count;
 		}
 		
+		public function countHoney():int {
+			var count:int = 0;
+			for(var i:int=0; i<width*height; i++) {
+				if(gameTiles[i] && gameTiles[i].getTile().type <= GameLogic.HONEY2) {
+					count++;
+				}
+			}
+			return count;
+		}
+
+		
 		public function drawLine(swipeSeq:SwipeSequence, effects:MovieClip):void {
 			// Remove all lines
 			lineTiles = new Vector.<LineTile>(width * height);				
@@ -334,5 +345,6 @@ package {
 			
 			return dict[tileNo];
 		}
+		
 	}
 }
