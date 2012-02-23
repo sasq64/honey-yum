@@ -1,6 +1,7 @@
 package {
 	import flash.display.DisplayObject;
 	import flash.display.DisplayObjectContainer;
+	import flash.display.Graphics;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.filters.DisplacementMapFilterMode;
@@ -269,36 +270,57 @@ package {
 			}
 
 			// And draw new
-			var seq:Vector.<int> = swipeSeq.getIndexes()
-			for(var x:int=0; x<seq.length; x++) {
-				var tileNo:int = seq[x];
-				var position:Point = getPosition(tileNo);
-				var nextPosition:Point = null;
+			var sprite:Sprite = new Sprite;
+			sprite.graphics.lineStyle(5, 0xffffff);
+			sprite.filters = filtersArray;
+			lineContainer.addChild(sprite);
 
-				// Adding tile marked effect
-				var effect:MovieClip = new plate_effect_2();
-				effect.x = position.x;
-				effect.y = position.y;
-				effect.scaleX = 0.7;
-				effect.scaleY = 0.7;
-				effect.play();
-				effects.addChild(effect);				
-				
-				var next:int = x + 1;
-				if (next < seq.length) {
-					var nextLineNo:int = seq[next];
-					nextPosition = getPosition(nextLineNo);		
-					var sp:Sprite = new Sprite;
-					lineContainer.addChild(sp);
-					sp.graphics.moveTo(position.x, position.y);
-					sp.graphics.lineStyle(5, 0xffffff);
-					sp.graphics.lineTo(nextPosition.x, nextPosition.y);
-					sp.filters = filtersArray;				
-				}
+			var points:Vector.<Point> = new Vector.<Point>;
+			for each (var tileNo:int in swipeSeq.getIndexes()) {
+				points.push(getPosition(tileNo));
 			}
-			
+
+			drawRoundPath(sprite, points);
 			doUpdate = swipeSeq.length() > 0;
 		}
+		
+		public function drawRoundPath(g:Sprite, points:Vector.<Point>, radius:Number = 20):void {  
+			var count:int = points.length;  
+			if (count < 2) return;  
+			
+			var p0:Point = points[0];  
+			var p1:Point = points[1];  
+			var p2:Point;  
+			var pp0:Point;  
+			var pp2:Point;  
+			
+			var last:Point;  
+
+			g.graphics.moveTo(p0.x, p0.y);  
+			last = points[count - 1];  
+			
+			var n:int = count - 1;  
+			
+			for (var i:int = 1; i < n; i++) {  
+				p2 = points[(i + 1) % count];  
+				
+				var v0:Point = p0.subtract(p1);  
+				var v2:Point = p2.subtract(p1);  
+				var r:Number = Math.max(1, Math.min(radius,  
+					Math.min(v0.length / 2, v2.length / 2)));  
+				v0.normalize(r);  
+				v2.normalize(r);  
+				pp0 = p1.add(v0);  
+				pp2 = p1.add(v2);  
+				
+				g.graphics..lineTo(pp0.x, pp0.y);
+				g.graphics.curveTo(p1.x, p1.y, pp2.x, pp2.y);  
+				p0 = p1;  
+				p1 = p2;  
+			}  
+			
+			g.graphics.lineTo(last.x, last.y);  
+		}  		
 		
 		public function getDirection(position:Point, nextPosition:Point):String {
 			if (nextPosition == null) {
@@ -340,9 +362,6 @@ package {
 		}
 		
 		public function getPosition(tileNo:int):Point {
-
-
-			
 			return dict[tileNo];
 		}
 		
