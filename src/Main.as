@@ -5,6 +5,7 @@ package
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	
+	[SWF(width='1024', height='768', backgroundColor='#000000', frameRate=60)]
 	public class Main extends Sprite {
 		private var gameBoard:GameBoard;
 		private var downX:Number;
@@ -13,22 +14,34 @@ package
 		private var swipeSeq:SwipeSequence;
 		private var doFill:Boolean;
 		private var doFall:Boolean;
+		private var tileSize:int;
+		private var padding:int;
+		private var boardWidth:int;
+		private var boardHeight:int;
 		
 		public function Main() {
 
 			var tiles:Array = [
-				new Tile(new ballBlue()),
-				new Tile(new ballGreen()),
-				new Tile(new ballMagenta()),
-				new Tile(new ballOrange()),
+				new Tile(new ballBlue(), 0),
+				new Tile(new ballGreen(), 1),
+				new Tile(new ballMagenta(), 2),
+				new Tile(new ballOrange(), 3),
 			];
-			
+
+			tileSize = 120;
+			padding = 5;
+			boardWidth = 6;
+			boardHeight = 6;
+
 			for each(var t:Tile in tiles) {
 				(t.dob as MovieClip).stop();
+				t.dob.scaleX = (tileSize - padding) / t.dob.width;
+				t.dob.scaleY = (tileSize - padding) / t.dob.height;
 			}
 			
-			gameBoard = new GameBoard(this,6,6, tiles);
-			swipeSeq = new SwipeSequence(6, 6, 40, 40);
+			
+			gameBoard = new GameBoard(this, boardWidth, boardHeight, tileSize, tiles);
+			swipeSeq = new SwipeSequence(gameBoard); //boardWidth, boardHeight, tileSize, tileSize);
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		}
 		
