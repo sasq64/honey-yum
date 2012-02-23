@@ -45,11 +45,11 @@ package
 			if(tileNo >= 0 && tileNo != lastTile) {
 
 				var gt:GameTile = gameBoard.getTile(tileNo);
-				if(lastType >= 0 && gt.getTile().type != lastType) {
+				if(lastType >= 0 && (gt.getTile().type & 0xf) != lastType) {
 					return;
 				}
 				
-				lastType = gt.getTile().type;
+				lastType = gt.getTile().type & 0xf;
 				
 				
 				for(var i:int=0; i<seq.length; i++) {
