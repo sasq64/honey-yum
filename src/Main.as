@@ -104,10 +104,10 @@ package
 		public function onUpdate(e:Event):void {
 			
 			if(doFill && !gameBoard.isMoving()) {
+				gameLogic.doDamage();
 				gameBoard.update(true);
 				gameBoard.fill();
 				doFill = false;
-				gameLogic.doDamage();
 			}
 
 			if(doFall && !gameBoard.isMoving()) {
