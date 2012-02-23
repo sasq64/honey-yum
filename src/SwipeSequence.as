@@ -24,12 +24,22 @@ package
 			seq = new Vector.<int>();
 		}
 		
+		private static var padding:Number = 0.3;
+		
 		private function calc(x:int, y:int):int {
 			var tx:int = (x / tileWidth);
 			var ty:int = (y / tileHeight);
+			
+			var dx:Number = (x / tileWidth) - tx;
+			var dy:Number = (y / tileWidth) - ty;
+			
+			if(dx < padding || dx > 1-padding || dy < padding || dy > 1-padding)
+				return -1;
+			
 			if(tx >= 0 && tx < width && ty >= 0 && ty < height) {
 				return tx + ty * width;
 			}
+			
 			return -1;
 		}
 		
@@ -44,7 +54,20 @@ package
 			var tileNo:int = calc(x,y);
 			if(tileNo >= 0 && tileNo != lastTile) {
 
+				if(lastTile >= 0) {
+					var x0:int = (tileNo % width);
+					var y0:int = (tileNo / width);
+					var x1:int = (lastTile % width);
+					var y1:int = (lastTile / width);
+					
+					if(Math.abs(x0-x1) > 1 || Math.abs(y0-y1) > 1)
+						return;
+				}
+
 				var gt:GameTile = gameBoard.getTile(tileNo);
+				
+				if(!gt) return;
+				
 				if(lastType >= 0 && (gt.getTile().type & 0xf) != lastType) {
 					return;
 				}
