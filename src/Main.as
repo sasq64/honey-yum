@@ -23,6 +23,7 @@ package
 		private var boardHeight:int;
 		private var gameLogic:GameLogic;
 		private var gameBoardContainer:MovieClip;
+		private var lineContainer:MovieClip;				
 		private var honeyText:Array;
 		
 		public function Main() {
@@ -49,7 +50,10 @@ package
 			gameBoardContainer = new MovieClip();
 			addChild(gameBoardContainer);
 			
-			gameBoard = new GameBoard(gameBoardContainer, boardWidth, boardHeight, tileSize, tiles);
+			lineContainer = new MovieClip();
+			addChild(lineContainer);						
+			
+			gameBoard = new GameBoard(gameBoardContainer, lineContainer, boardWidth, boardHeight, tileSize, tiles);
 			swipeSeq = new SwipeSequence(gameBoard); //boardWidth, boardHeight, tileSize, tileSize);
 			
 			gameLogic = new GameLogic(gameBoard);
@@ -102,6 +106,8 @@ package
 		}
 		
 		public function onUpdate(e:Event):void {
+			gameBoard.drawLine(swipeSeq);					
+			
 			
 			if(doFill && !gameBoard.isMoving()) {
 				gameLogic.doDamage();
