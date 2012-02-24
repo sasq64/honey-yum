@@ -23,6 +23,8 @@ package {
 		private var tileSize:int;
 		private var dict:Dictionary;		
 		private var filtersArray:Array;		
+		private var scoreX:int;
+		private var scoreY:int;
 		
 		public function getWidth():int { return width; }
 		public function getHeight():int { return height; }
@@ -38,6 +40,7 @@ package {
 		
 		public function getTile(i:int, j:int = -1):GameTile {
 			if(j != -1) i += j*width;
+			if(i<0 || i > gameTiles.length) return null;
 			return gameTiles[i];
 		}
 
@@ -128,6 +131,11 @@ package {
 			
 		}
 		
+		public function setHoneyTarget(x:int, y:int) {
+			scoreX = x;
+			scoreY = y;
+		}
+		
 		
 		public function remove(swipeSeq:SwipeSequence):void {
 			
@@ -158,8 +166,8 @@ package {
 					
 					if(tp >= GameLogic.HONEY0 && tp <= GameLogic.HONEY2) {
 
-						var tx:int = 1000;
-						var ty:int = 150;
+						var tx:int = scoreX;
+						var ty:int = scoreY;
 						
 						if(bees.length) {
 							var j:int = bees.pop();
@@ -263,7 +271,7 @@ package {
 		}
 
 		
-		public function drawLine(swipeSeq:SwipeSequence, effects:MovieClip):void {
+		public function drawLine(swipeSeq:SwipeSequence, effects:MovieClip, size:int = 5):void {
 			// Remove all lines
 			//return;
 			lineTiles = new Vector.<LineTile>(width * height);				
@@ -274,11 +282,11 @@ package {
 			//while(effects.numChildren)
 			//	effects.removeChildAt(0);
 			
-			trace("%%%%", effects.numChildren);
+			//trace("%%%%", effects.numChildren);
 
 			// And draw new
 			var sprite:Sprite = new Sprite;
-			sprite.graphics.lineStyle(5, 0xffffff);
+			sprite.graphics.lineStyle(size, 0xffffff);
 			sprite.filters = filtersArray;
 			lineContainer.addChild(sprite);
 
@@ -320,7 +328,7 @@ package {
 				pp0 = p1.add(v0);  
 				pp2 = p1.add(v2);  
 				
-				g.graphics..lineTo(pp0.x, pp0.y);
+				g.graphics.lineTo(pp0.x, pp0.y);
 				g.graphics.curveTo(p1.x, p1.y, pp2.x, pp2.y);  
 				p0 = p1;  
 				p1 = p2;  
