@@ -4,6 +4,7 @@ package
 	
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
+	import flash.display.BlendMode;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.display.StageDisplayState;
@@ -20,6 +21,14 @@ package
 	
 	[SWF(width='1024', height='768', backgroundColor='#000000', frameRate=60)]
 	public class Main extends Sprite {
+
+		// SETTINGS
+		private var boardHeight:int = 6;
+		private var boardWidth:int = 6;
+		private var turnTime:int = 20;
+		private var turns:int = 10;
+
+		
 		private var gameBoard:GameBoard;
 		private var downX:Number;
 		private var downY:Number;
@@ -29,15 +38,11 @@ package
 		private var doFall:Boolean;
 		private var tileSize:int;
 		private var padding:int;
-		private var boardWidth:int;
-		private var boardHeight:int;
 		private var gameLogic:GameLogic;
 		private var gameBoardContainer:MovieClip;
 		private var lineContainer:MovieClip;				
 		private var honeyText:Array;
 		private var effects:MovieClip;
-		private var turnTime:int;
-		private var turns:int;
 
 		private var frame:int = 0;
 		private var seconds:int;
@@ -61,19 +66,23 @@ package
 		private var boardBack:Bitmap;
 		private var screenWidth:uint;
 		private var screenHeight:uint;
+		
+		public static const DO_FULLSCREEN:Boolean = true;
+		private var background:Bitmap;
+		private var ropeFrame:rope_frame;
 
 		public function Main() {
 
 
-			
-			screenWidth = stage.fullScreenWidth;
-			screenHeight = stage.fullScreenHeight;
-			stage.fullScreenSourceRect = new Rectangle(0,0,screenWidth,screenHeight);
-			stage.displayState = StageDisplayState.FULL_SCREEN;
-			
-			//screenWidth = stage.stageWidth;
-			//screenHeight = stage.stageHeight;
-			
+			if(DO_FULLSCREEN) {
+				screenWidth = stage.fullScreenWidth;
+				screenHeight = stage.fullScreenHeight;
+				stage.fullScreenSourceRect = new Rectangle(0,0,screenWidth,screenHeight);
+				stage.displayState = StageDisplayState.FULL_SCREEN;
+			} else {
+				screenWidth = stage.stageWidth;
+				screenHeight = stage.stageHeight;
+			}
 			
 			addEventListener(Event.ADDED_TO_STAGE, _init);
 		
@@ -199,30 +208,31 @@ package
 				new Tile(new ballOrange(), GameLogic.HONEY2) */
 			];
 			
-			boardWidth = 8;
-			boardHeight = 8;
+			//boardWidth = 6;
+			//boardHeight = 6;
 			
 			tileSize = (screenHeight - 150) / boardHeight;
 			padding = 20;
-			turnTime = 20;
-			turns = 10;
+			//turnTime = 20;
+			//turns = 10;
 			
 			offsX = (screenWidth - tileSize * boardWidth)/2;
 			offsY = screenHeight/15;
 
 			
 			var hb:honeyBack = new honeyBack();
-			var background:Bitmap = new Bitmap(hb);
+			background = new Bitmap(hb);
 			background.smoothing = true;
 			background.scaleX = screenWidth / background.width;
-			background.scaleY = screenWidth / background.height;
+			background.scaleY = screenHeight / background.height;
 			addChild(background);
 			
 			
 			var bm:Bitmap = new Bitmap(new backgr_square());
 			bm.smoothing = true;
+			//bm.alpha = 0.1;
 			
-			var bd:BitmapData = new BitmapData(tileSize * boardWidth, tileSize * boardHeight);
+			var bd:BitmapData = new BitmapData(tileSize * boardWidth, tileSize * boardHeight, true, 0);
 			var sx:Number = tileSize / bm.width;
 			var sy:Number = tileSize / bm.height;
 			
@@ -236,10 +246,20 @@ package
 			
 			
 			boardBack = new Bitmap(bd);
+			//boardBack.alpha = 0.8;
 			boardBack.x = offsX - padding/2;
 			boardBack.y = offsY - padding/2;
 			boardBack.visible = false;
 			addChild(boardBack);
+			
+			ropeFrame = new rope_frame();
+			ropeFrame.scaleX = boardBack.width * 1.03 / ropeFrame.width;
+			ropeFrame.scaleY = boardBack.height * 1.03 / ropeFrame.height;
+			ropeFrame.x = boardBack.x + boardBack.width / 2;
+			ropeFrame.y = boardBack.y + boardBack.height / 2;
+			addChild(ropeFrame);
+			ropeFrame.visible = false;
+			
 			
 			for each(var t:Tile in tiles) {
 				if(t.dob is MovieClip)
@@ -304,7 +324,9 @@ package
 					gameStart = true;
 					gameIntro = false;
 					removeChild(logo);
+					//background.visible = false;
 					boardBack.visible = true;
+					ropeFrame.visible = true;
 
 					gameBoard.update(true);
 					nextTurn = seconds + turnTime;
@@ -351,7 +373,7 @@ package
 					removeChild(lineContainer);					
 					var bd:Bitmap = new Bitmap(new game_over());
 					bd.x = (screenWidth - bd.width) / 2;
-					bd.y = (screenWidth - bd.height) / 2;
+					bd.y = (screenHeight - bd.height) / 2;
 					addChild(bd);				
 					
 					scorePanel.turn.text = "0";

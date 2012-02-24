@@ -183,7 +183,17 @@ package {
 						//gameTiles[i].remove();
 						//gameTiles[i] = null;
 					} else {
-						gameTiles[i].remove();
+						
+						var cx:int = tileSize * width / 2;
+						var cy:int = tileSize * height / 2;
+						
+						var angle:Number = Math.random() * 2 * Math.PI;
+						var ax:Number = cx + Math.cos(angle) * tileSize * width; 
+						var ay:Number = cy + Math.sin(angle) * tileSize * height;
+						
+						gameTiles[i].moveTo(ax-x, ay-y,true);
+						
+						//gameTiles[i].remove();
 					}
 				}
 			}
@@ -239,10 +249,12 @@ package {
 						else
 							r = (Math.random() * 3);
 						gameTiles[i] = new GameTile(tiles[r]);
-						if(fromBottom)
-							gameTiles[i].rise(40*y + 40);
-						else
-							gameTiles[i].fall(40*y + 40);
+						gameTiles[i].dy = 0;
+						if(fromBottom) {
+							gameTiles[i].rise(tileSize*y + tileSize);
+						} else {
+							gameTiles[i].fall(tileSize*y + tileSize);
+						}
 					}
 				}
 			}
