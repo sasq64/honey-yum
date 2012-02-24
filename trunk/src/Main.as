@@ -53,6 +53,7 @@ package
 		private var gameIntro:Boolean;
 		private var logo:Bitmap;
 		private var swipeOn:Boolean;
+		private var boardBack:Bitmap;
 
 		public function Main() {
 
@@ -77,13 +78,19 @@ package
 
 			tileSize = 132;
 			padding = 20;
-			turnTime = 30;
+			turnTime = 20;
 			turns = 10;
 
+			var hb:honeyBack = new honeyBack();
+			var background:Bitmap = new Bitmap(hb);
+			background.smoothing = true;
+			background.scaleX = stage.stageWidth / background.width;
+			background.scaleY = stage.stageHeight / background.height;
+			addChild(background);
+
+			
 			var bm:Bitmap = new Bitmap(new backgr_square());
 			bm.smoothing = true;
-			//bm.scaleX = stage.stageWidth / bm.width;
-			//bm.scaleY = stage.stageHeight / bm.height;
 
 			var bd:BitmapData = new BitmapData(tileSize * boardWidth, tileSize * boardHeight);
 			var sx:Number = tileSize / bm.width;
@@ -98,10 +105,11 @@ package
 			}
 			
 			
-			var back:Bitmap = new Bitmap(bd);
-			back.x = offsX - padding/2;
-			back.y = offsY - padding/2;
-			addChild(back);
+			boardBack = new Bitmap(bd);
+			boardBack.x = offsX - padding/2;
+			boardBack.y = offsY - padding/2;
+			boardBack.visible = false;
+			addChild(boardBack);
 						
 			for each(var t:Tile in tiles) {
 				if(t.dob is MovieClip)
@@ -134,7 +142,7 @@ package
 			addChild(effects);
 			
 			scorePanel = new Score_Turn_Time();
-			scorePanel.x = 340;
+			scorePanel.x = 300 + (stage.stageWidth - scorePanel.width) / 2;
 			scorePanel.y = stage.stageHeight - scorePanel.height + 20;
 			
 			bonusText = makeTextField();
@@ -172,7 +180,7 @@ package
 			return tf;
 		}
 		
-		private function endSwipe():void {
+		private function endSwipe(force:Boolean = false):void {
 			swipeSeq.end();
 			if(swipeSeq.length() >= 3) {
 				
@@ -232,9 +240,11 @@ package
 				}
 				turns--;
 				nextTurn = seconds + turnTime;
+			} else if(force) {
+				turns--;
+				nextTurn = seconds + turnTime;
 			}
-			swipeSeq.clear();
-			
+			swipeSeq.clear();			
 		}
 		
 		public function _init(e:Event = null):void {
@@ -253,6 +263,8 @@ package
 					gameStart = true;
 					gameIntro = false;
 					removeChild(logo);
+					boardBack.visible = true;
+
 					gameBoard.update(true);
 					nextTurn = seconds + turnTime;
 					return;
@@ -346,7 +358,7 @@ package
 			scorePanel.time.text = (nextTurn - seconds).toString();
 			
 			if(nextTurn <= seconds) {
-				endSwipe();
+				endSwipe(true);
 			}
 			
 			

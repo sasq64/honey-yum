@@ -112,7 +112,7 @@ public function handleSequence(swipeSeq:SwipeSequence):int {
 				}
 			}
 			
-			if(bees > 0 && flowers >= bees) {
+			if(flowers >= bees) {
 				if(bees == flowers) lastBonus = 80;
 				lastScore = indexes.length * 4 + lastBonus;
 				totalScore += lastScore;
