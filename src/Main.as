@@ -140,10 +140,12 @@ package
 							bonusText.x = offsX + x;
 							bonusText.y = offsY + y;
 							bonusText.alpha = 1;
+							bonusText.scaleX = 0.6;
+							bonusText.scaleY = 0.6;							
 							bonusText.visible = true;
 							bonusText.text = gameLogic.getLastScore() + "";
-							TweenLite.to(bonusText, 1.3, 
-								{ x:offsX + x+50, alpha:0, onComplete:function():void {
+							TweenLite.to(bonusText, 1, 
+								{ x:offsX + x+50, alpha:0.7, scaleX: 1.5, scaleY: 1.5, onComplete:function():void {
 									bonusText.visible = false;
 								}});
 						}						
