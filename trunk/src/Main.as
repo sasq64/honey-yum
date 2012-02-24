@@ -205,7 +205,8 @@ package
 							effect.x = x;
 							effect.y = y;							
 						}
-						effect.play();
+						// effect.play();
+						effect.gotoAndPlay(Math.round(Math.random() * 10));
 						effects.addChild(effect);
 						
 						if (i == (len-1)) {
@@ -220,7 +221,7 @@ package
 						}						
 					}
 					
-					TweenLite.to(effects, 0.9, {  onComplete:function():void {
+					TweenLite.to(effects, 2, {  onComplete:function():void {
 						while(effects.numChildren)
 							effects.removeChildAt(0);
 					}});
