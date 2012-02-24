@@ -47,6 +47,7 @@ package
 		private var scorePanel:Score_Turn_Time;
 		private var offsX:int;
 		private var offsY:int;
+		private var bonusText:TextField;
 
 		public function Main() {
 
@@ -131,6 +132,10 @@ package
 			scorePanel.x = 340;
 			scorePanel.y = stage.stageHeight - scorePanel.height;
 			
+			bonusText = makeTextField();
+			bonusText.width = 100;									
+			addChild(bonusText);
+			
 			gameBoard.setHoneyTarget(0, scorePanel.y);
 			
 			//mc.play();
@@ -168,10 +173,12 @@ package
 					gameBoard.remove(swipeSeq);
 					
 					var len:int = swipeSeq.getIndexes().length;
+					var seq:Vector.<int> = swipeSeq.getIndexes();
 					
-					for each(var i:int in swipeSeq.getIndexes()) {							
-						var x:int = (i % boardWidth) * tileSize;
-						var y:int = (i / boardHeight) * tileSize;
+					for (var i:int=0; i<len; i++) {	
+						var tileNo:int = seq[i];
+						var x:int = (tileNo % boardWidth) * tileSize;
+						var y:int = (tileNo / boardHeight) * tileSize;
 
 						var effect:MovieClip;
 						if (swipeType == 3) {
@@ -189,6 +196,17 @@ package
 						}
 						effect.play();
 						effects.addChild(effect);
+						
+						if (i == (len-1)) {
+							bonusText.x = x;
+							bonusText.y = y;
+							bonusText.visible = true;
+							bonusText.text = gameLogic.getLastScore() + "";
+							TweenLite.to(bonusText, 0.5, 
+								{ x:x+50, onComplete:function():void {
+									bonusText.visible = false;
+								}});
+						}						
 					}
 					
 					TweenLite.to(effects, 0.9, {  onComplete:function():void {
