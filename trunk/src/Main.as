@@ -137,12 +137,13 @@ package
 						effects.addChild(effect);
 						
 						if (i == (len-1)) {
-							bonusText.x = x;
-							bonusText.y = y;
+							bonusText.x = offsX + x;
+							bonusText.y = offsY + y;
+							bonusText.alpha = 1;
 							bonusText.visible = true;
 							bonusText.text = gameLogic.getLastScore() + "";
-							TweenLite.to(bonusText, 0.5, 
-								{ x:x+50, onComplete:function():void {
+							TweenLite.to(bonusText, 1.3, 
+								{ x:offsX + x+50, alpha:0, onComplete:function():void {
 									bonusText.visible = false;
 								}});
 						}						
