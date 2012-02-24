@@ -66,21 +66,29 @@ public function handleSequence(swipeSeq:SwipeSequence):int {
 			if(t >= HONEY0 && t <= HONEY2) {
 				
 				var bees:int = gameBoard.countTiles(BEE);
+				
 				var count:int = indexes.length - bees;
+
+				for each(var ix:int in indexes) {
+					if(!gameBoard.getTile(i))
+						count -= 2;
+				}
+				
 				lastDeduct = bees;
 				if(count < 0) count = 0;
 				if(count > 5)
-					lastBonus += (count - 5) * 3;
+					lastBonus += (count - 5) * 8;
 				if(count > 8)
-					lastBonus += (count - 8) * 5;
+					lastBonus += (count - 8) * 15;
 				
-				 lastScore = count + lastBonus;
+				 lastScore = count * 5 + lastBonus;
 				
 				trace("REMOVED", t, indexes.length, gameBoard.countTiles(t));
 				if(indexes.length >= gameBoard.countTiles(t)) {
 					// Collected all
 					lastBonus += count * 5 + 100;
 					lastScore += count * 5 + 100;
+					totalScore += lastScore;
 					return SWIPE_ALL;
 				}
 				
@@ -105,7 +113,8 @@ public function handleSequence(swipeSeq:SwipeSequence):int {
 			}
 			
 			if(bees > 0 && flowers >= bees) {
-				lastScore = indexes.length;
+				if(bees == flowers) lastBonus = 80;
+				lastScore = indexes.length * 4 + lastBonus;
 				totalScore += lastScore;
 				return SWIPE_BEES;
 			}
