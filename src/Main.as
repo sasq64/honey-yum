@@ -284,11 +284,7 @@ package
 			
 			gameBoard.update();
 			
-			var score:int = 0;
-			for(var i:int = 0; i<3; i++) {
-				score += gameLogic.getHoney(i);
-				//honeyText[i].text = gameLogic.getHoney(i).toString();
-			}
+			var score:int = gameLogic.getScore();
 			
 			scorePanel.score.text = score.toString();
 			
