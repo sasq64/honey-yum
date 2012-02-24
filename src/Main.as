@@ -185,23 +185,24 @@ package
 					
 					for (var i:int=0; i<len; i++) {	
 						var tileNo:int = seq[i];
-						var x:int = (tileNo % boardWidth) * tileSize;
-						var y:int = (tileNo / boardHeight) * tileSize;
+
+						var x:int = gameBoard.getPosition(tileNo).x;
+						var y:int = gameBoard.getPosition(tileNo).y;
 
 						var effect:MovieClip;
 						if (swipeType == 3) {
 							effect = new large_EFFECT();							
-							effect.x = x + (tileSize/2);
+							effect.x = x;
 							effect.y = y;														
 						} else if (len < 8) {
 							effect = new small_EFFECT();
-							effect.x = x + (tileSize/2);
+							effect.x = x;
 							effect.y = y + (tileSize/2);
 							effect.scaleX = tileSize / (effect.width*3);
 							effect.scaleY = tileSize / (effect.height*3);							
 						} else if (len >= 8) {
 							effect = new medium_EFFECT();							
-							effect.x = x + (tileSize/2);
+							effect.x = x;
 							effect.y = y;							
 						}
 						effect.play();
