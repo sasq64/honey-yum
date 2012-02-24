@@ -189,6 +189,8 @@ package
 							effect = new small_EFFECT();
 							effect.x = x + (tileSize/2);
 							effect.y = y + (tileSize/2);
+							effect.scaleX = tileSize / (effect.width*3);
+							effect.scaleY = tileSize / (effect.height*3);							
 						} else if (len >= 8) {
 							effect = new medium_EFFECT();							
 							effect.x = x + (tileSize/2);
