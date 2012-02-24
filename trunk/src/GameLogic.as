@@ -15,6 +15,7 @@ package {
 		private var honey:Array = [0,0,0];//new Array();
 		private var turns:int;
 		private var turnTime:int;
+		private var lastScore:int;
 
 		public function GameLogic(gb:GameBoard, tt:int, t:int) {						
 			gameBoard = gb;
@@ -26,12 +27,19 @@ package {
 			return honey[i];
 		}
 		
+		public function getLastScore():int {
+			return lastScore;
+		}
+		
 		public function handleSequence(swipeSeq:SwipeSequence):int {
 		
 			var indexes:Vector.<int> = swipeSeq.getIndexes();
 			
 			var first:GameTile = null;
 			var i:int = 0;
+			
+			lastScore = 0;
+			
 			while(!first) {
 				first = gameBoard.getTile(indexes[i++]);
 				if(i >= indexes.length)
@@ -50,20 +58,21 @@ package {
 				if(count > 8)
 					bonus += (count - 8) * 5;
 				
-				honey[t-1] += count + bonus;
+				 lastScore = count + bonus;
 				
 				trace("REMOVED", t, indexes.length, gameBoard.countTiles(t));
 				if(indexes.length >= gameBoard.countTiles(t)) {
 					// Collected all
-					honey[t-1] += count * 5 + 100;
+					lastScore += count * 5 + 100;
 					return 3;
 				}
+				
+				honey[t-1] += lastScore;
 				
 				
 				return 1;
 			}
 			
-			honey[0] += indexes.length;
 			
 			// Handle attack
 			 var flowers:int = 0;
@@ -78,7 +87,12 @@ package {
 				}
 			}
 			
-			return (bees > 0 && flowers >= bees) > 0 ? 2 : 0; //(flowers >= bees);
+			if(bees > 0 && flowers >= bees) {
+				lastScore = indexes.length;
+				honey[0] += lastScore;
+				return 2;
+			}
+			return 0;
 		}
 		
 		public function doTurn():void {
