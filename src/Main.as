@@ -3,15 +3,17 @@ package
 	import com.greensock.TweenLite;
 	
 	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
+	import flash.geom.Matrix;
 	import flash.text.TextField;
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	
-	[SWF(width='1024', height='768', backgroundColor='#000000', frameRate=60)]
+	[SWF(width='1280', height='1024', backgroundColor='#000000', frameRate=60)]
 	public class Main extends Sprite {
 		private var gameBoard:GameBoard;
 		private var downX:Number;
@@ -37,10 +39,14 @@ package
 		
 		public static const FPS:int = 60;
 		private var nextTurn:int;
-		private var turnText:TextField;
+		/*private var turnText:TextField;
 		private var timeText:TextField;
-		private var scoreText:TextField;
+		private var scoreText:TextField; */
+		
 		private var swipeType:int;
+		private var scorePanel:Score_Turn_Time;
+		private var offsX:int;
+		private var offsY:int;
 
 		public function Main() {
 
@@ -57,20 +63,39 @@ package
 				new Tile(new ballBlue(), GameLogic.HONEY1),
 				new Tile(new ballOrange(), GameLogic.HONEY2) */
 			];
-
-			tileSize = 100;
-			padding = 5;
+			
 			boardWidth = 6;
-			boardHeight = 6;
+			boardHeight = 5;
+			offsX = 100;
+			offsY = 50;
+
+			tileSize = 180;
+			padding = 50;
 			turnTime = 30;
 			turns = 10;
-			
-			var bm:Bitmap = new Bitmap(new background());
-			bm.smoothing = true;
-			bm.scaleX = stage.stageWidth / bm.width;
-			bm.scaleY = stage.stageHeight / bm.height;
 
-			//addChild(bm);
+			var bm:Bitmap = new Bitmap(new backgr_square());
+			bm.smoothing = true;
+			//bm.scaleX = stage.stageWidth / bm.width;
+			//bm.scaleY = stage.stageHeight / bm.height;
+
+			var bd:BitmapData = new BitmapData(tileSize * boardWidth, tileSize * boardHeight);
+			var sx:Number = tileSize / bm.width;
+			var sy:Number = tileSize / bm.height;
+			
+			for(var y:int=0; y<boardHeight; y++) {
+				for(var x:int=0; x<boardWidth; x++) {
+
+					var m:Matrix = new Matrix(sx,0,0,sy,x*tileSize,y*tileSize);					
+					bd.draw(bm, m);
+				}
+			}
+			
+			
+			var back:Bitmap = new Bitmap(bd);
+			back.x = offsX - padding/2;
+			back.y = offsY - padding/2;
+			addChild(back);
 						
 			for each(var t:Tile in tiles) {
 				if(t.dob is MovieClip)
@@ -80,51 +105,47 @@ package
 			}
 					
 			gameBoardContainer = new MovieClip();
+			gameBoardContainer.x = offsX;
+			gameBoardContainer.y = offsY;
 			addChild(gameBoardContainer);
 			
+			offsX -= padding/2;
+			offsY -= padding/2;
+			
 			lineContainer = new MovieClip();
+			lineContainer.x = offsX;
+			lineContainer.y = offsY;
 			addChild(lineContainer);						
 			
 			gameBoard = new GameBoard(gameBoardContainer, lineContainer, boardWidth, boardHeight, tileSize, tiles);
 			swipeSeq = new SwipeSequence(gameBoard); //boardWidth, boardHeight, tileSize, tileSize);
 			
 			gameLogic = new GameLogic(gameBoard, turnTime, turns);
-			
-			/*honeyText = [ makeTextField(), makeTextField(), makeTextField() ];
-			var i:int = 0;
-			for each(var tf:TextField in honeyText) {
-				tf.y = 20;
-				tf.x = 50 + 100 * i++;
-				addChild(tf);
-			}*/
-			
-			turnText = makeTextField();
-			turnText.x = 10;
-			turnText.y = 720;
-			addChild(turnText);
-			
-			timeText = makeTextField();
-			timeText.x = 210;
-			timeText.y = 720;
-			addChild(timeText);
-			
-			scoreText = makeTextField();
-			scoreText.x = 900;
-			scoreText.y = 720;
-			addChild(scoreText);
-
-			
+					
 			effects = new MovieClip();
+			effects.x = offsX;
+			effects.y = offsY;
 			addChild(effects);
 			
-			//var mc:MovieClip = new effect_1();
-			//mc.x = 100;
-			//mc.y = 100;
+			scorePanel = new Score_Turn_Time();
+			scorePanel.x = 340;
+			scorePanel.y = stage.stageHeight - scorePanel.height;
+			
+			gameBoard.setHoneyTarget(0, scorePanel.y);
+			
 			//mc.play();
-			//addChild(mc);
+			addChild(scorePanel);
+			
+			this.stage.addEventListener(Event.RESIZE, function(e:Event) {
+				setupStage();
+			});
+			
 
 			
 			addEventListener(Event.ADDED_TO_STAGE, _init);
+		}
+		
+		private function setupStage():void {
 		}
 		
 		private function makeTextField():TextField {
@@ -190,14 +211,14 @@ package
 			
 			
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
-				swipeSeq.start(e.stageX, e.stageY);
+				swipeSeq.start(e.stageX - offsX, e.stageY - offsY);
 			});
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
 				endSwipe();
 			});
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
 				if(e.buttonDown)
-					swipeSeq.add(e.stageX, e.stageY);
+					swipeSeq.add(e.stageX - offsX, e.stageY - offsY);
 			});
 			
 			addEventListener(Event.ENTER_FRAME, onUpdate);
@@ -216,7 +237,7 @@ package
 			
 			
 
-			gameBoard.drawLine(swipeSeq, effects);			
+			gameBoard.drawLine(swipeSeq, effects, tileSize / 8);			
 			
 			if(doFill && !gameBoard.isMoving()) {
 				gameBoard.update(true);
@@ -251,20 +272,19 @@ package
 				//honeyText[i].text = gameLogic.getHoney(i).toString();
 			}
 			
-			scoreText.text = score.toString();
-
+			scorePanel.score.text = score.toString();
 			
-			turnText.text = turns.toString();
-			timeText.text = (nextTurn - seconds).toString();
+			scorePanel.turn.text = turns.toString();
+			scorePanel.time.text = (nextTurn - seconds).toString();
 			
 			if(nextTurn <= seconds) {
 				endSwipe();
 			}
 			
 			
-			if(swipeSeq.length() > 0) {
-				trace(swipeSeq.toString());
-			}
+			//if(swipeSeq.length() > 0) {
+			//	trace(swipeSeq.toString());
+			//}
 			
 		}
 	}
