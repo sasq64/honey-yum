@@ -13,7 +13,7 @@ package
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
 	
-	[SWF(width='1280', height='1024', backgroundColor='#000000', frameRate=60)]
+	[SWF(width='1024', height='768', backgroundColor='#000000', frameRate=60)]
 	public class Main extends Sprite {
 		private var gameBoard:GameBoard;
 		private var downX:Number;
@@ -48,6 +48,11 @@ package
 		private var offsX:int;
 		private var offsY:int;
 		private var bonusText:TextField;
+		private var gameOver:Boolean;
+		private var gameStart:Boolean;
+		private var gameIntro:Boolean;
+		private var logo:Bitmap;
+		private var swipeOn:Boolean;
 
 		public function Main() {
 
@@ -67,11 +72,11 @@ package
 			
 			boardWidth = 6;
 			boardHeight = 5;
-			offsX = 100;
-			offsY = 50;
+			offsX = 130;
+			offsY = 30;
 
-			tileSize = 180;
-			padding = 50;
+			tileSize = 132;
+			padding = 20;
 			turnTime = 30;
 			turns = 10;
 
@@ -130,7 +135,7 @@ package
 			
 			scorePanel = new Score_Turn_Time();
 			scorePanel.x = 340;
-			scorePanel.y = stage.stageHeight - scorePanel.height;
+			scorePanel.y = stage.stageHeight - scorePanel.height + 20;
 			
 			bonusText = makeTextField();
 			bonusText.width = 100;									
@@ -148,6 +153,9 @@ package
 
 			
 			addEventListener(Event.ADDED_TO_STAGE, _init);
+		}
+		
+		private function addTiles():void {
 		}
 		
 		private function setupStage():void {
@@ -220,30 +228,52 @@ package
 					//gameBoard.fill();
 					doFall = true;
 				}
+				turns--;
+				nextTurn = seconds + turnTime;
 			}
 			swipeSeq.clear();
 			
-			turns--;
-			nextTurn = seconds + turnTime;
 		}
 		
 		public function _init(e:Event = null):void {
 			
+			gameIntro = true;
+			logo = new Bitmap(new intro_logo());
+			logo.x = (stage.stageWidth - logo.width) / 2;
+			logo.y = (stage.stageHeight - logo.height) / 2;
+			addChild(logo);
+			
+			
 			
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent):void {
+				
+				if(gameIntro) {
+					gameStart = true;
+					gameIntro = false;
+					removeChild(logo);
+					gameBoard.update(true);
+					nextTurn = seconds + turnTime;
+					return;
+				}
+				
+				if(gameBoard.isMoving()) return;
+				swipeOn = true;
 				swipeSeq.start(e.stageX - offsX, e.stageY - offsY);
 			});
 			stage.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent):void {
-				endSwipe();
+				if(swipeOn) {
+					swipeOn = false;
+					endSwipe();
+				}
 			});
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent):void {
-				if(e.buttonDown)
+				if(e.buttonDown && swipeOn)
 					swipeSeq.add(e.stageX - offsX, e.stageY - offsY);
 			});
 			
 			addEventListener(Event.ENTER_FRAME, onUpdate);
 			
-			gameBoard.update(true);
+			//gameBoard.update(true);
 			
 			nextTurn = turnTime;
 			
@@ -255,8 +285,28 @@ package
 			
 			seconds = (frame / FPS);
 			
-			
+			if(gameIntro) {
+				return;
+			}
 
+			if(turns <= 0 && !gameBoard.isMoving()) {
+								
+				if(!gameOver) {
+					gameOver = true;
+					removeChild(lineContainer);					
+					var bd:Bitmap = new Bitmap(new game_over());
+					bd.x = (stage.stageWidth - bd.width) / 2;
+					bd.y = (stage.stageHeight - bd.height) / 2;
+					addChild(bd);				
+					
+					scorePanel.turn.text = "0";
+					scorePanel.time.text = "";					
+				}
+				
+				return;
+			}
+
+			
 			gameBoard.drawLine(swipeSeq, effects, tileSize / 8);			
 			
 			if(doFill && !gameBoard.isMoving()) {
