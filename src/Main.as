@@ -13,6 +13,7 @@ package
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
+	import flash.system.Security;
 	import flash.system.System;
 	import flash.text.TextField;
 	import flash.text.TextFieldType;
@@ -73,6 +74,7 @@ package
 
 		public function Main() {
 
+			Security.allowDomain("*");
 
 			if(DO_FULLSCREEN) {
 				screenWidth = stage.fullScreenWidth;
