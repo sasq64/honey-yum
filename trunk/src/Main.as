@@ -273,7 +273,8 @@ package
 			scorePanel.y = screenHeight - scorePanel.height + 20;
 			
 			bonusText = makeTextField();
-			bonusText.width = 100;									
+			bonusText.width = 100;	
+			bonusText.visible = false;
 			addChild(bonusText);
 			
 			gameBoard.setHoneyTarget(0, scorePanel.y);
